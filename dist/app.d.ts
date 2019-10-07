@@ -1,0 +1,10 @@
+declare const axios: any;
+declare const chalk: any;
+declare const regex: RegExp;
+declare const init: (args: string[]) => void;
+declare const doGet: (url: string, count: number) => Promise<void>;
+declare const doPost: (url: string, count: number, data?: any) => Promise<void>;
+declare const testUrl: (url: string) => void;
+declare const get: (url: string) => Promise<any>;
+declare const post: (url: string, data: any) => Promise<any>;
+declare const errorLog: (err: Error) => void;
