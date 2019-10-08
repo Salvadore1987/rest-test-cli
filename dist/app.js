@@ -83,8 +83,8 @@ const _printReport = (count, totalReqTime) => {
     console.log(total);
     console.log(success);
     console.log(rejected);
-    console.log(average);
     console.log(totalTime);
+    console.log(average);
     console.log(minTime);
     console.log(maxTime);
 };
@@ -113,7 +113,18 @@ const _calculate = (count, totalReqTime) => {
     return report;
 };
 const _min = () => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min, 0);
+    const stream = results.filter(i => i.success == true).map(i => i.answerTime);
+    let res;
+    if (stream.length > 0) {
+        res = stream.reduce((min, p, i, arr) => {
+            if (arr.length == 0)
+                return 0;
+            return p < min ? p : min;
+        });
+    }
+    else {
+        res = 0;
+    }
     return Math.round((res * 100) / 100);
 };
 const _max = () => {

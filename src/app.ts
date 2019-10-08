@@ -115,7 +115,17 @@ const _calculate = (count: number, totalReqTime: number): IReport => {
 }
 
 const _min = (): number => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min, 0);
+    const stream = results.filter(i => i.success == true).map(i => i.answerTime);
+    let res: number;
+    if (stream.length > 0) {
+        res = stream.reduce((min, p, i, arr) => {
+            if (arr.length == 0)
+                return 0;
+            return p < min ? p : min
+        });
+    } else {
+        res = 0;
+    }    
     return Math.round((res * 100) / 100);
 }
 
