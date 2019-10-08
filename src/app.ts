@@ -39,28 +39,8 @@ const doGet = async (url: string, count: number): Promise<void> => {
         results.push(result);
     }
     const end = Date.now();
-    const totalReqTime = Math.round(((end - begin) * 100) / 100);
-    _printReport(count, totalReqTime);
+    _printReport(count, _totalReqTime(begin, end));
     
-}
-
-const _printReport = (count: number, totalReqTime: number): void => {
-    const res = _calculate(count, totalReqTime);
-    const total = chalk.green('Total requests: ' + res.total);
-    const success = chalk.yellow('Success requests: ' + res.success + '%');
-    const rejected = chalk.red('Rejected requests: ' + res.rejected + '%');
-    const time = Math.round(res.avverageTime * 100) / 100
-    const average = chalk.blue('Average requests time: ' + time + ' ms');
-    const totalTime = chalk.blue('Total request time: ' + totalReqTime + ' ms');
-    const minTime = chalk.green('Min request time: ' + res.minRequestTime + ' ms');
-    const maxTime = chalk.red('Max request time: ' + res.maxRequestTime + ' ms');
-    console.log(total);
-    console.log(success);
-    console.log(rejected);
-    console.log(average);
-    console.log(totalTime);
-    console.log(minTime);
-    console.log(maxTime);
 }
 
 const doPost = async (url: string, count: number, data?: any): Promise<void> => {
@@ -80,8 +60,30 @@ const doPost = async (url: string, count: number, data?: any): Promise<void> => 
         results.push(result);  
     }
     const end = Date.now();
-    const totalReqTime = Math.round(((end - begin) * 100) / 100);
-    _printReport(count, totalReqTime);
+    _printReport(count, _totalReqTime(begin, end));
+}
+
+const _totalReqTime = (begin: number, end: number): number {
+    return Math.round(((end - begin) * 100) / 100);
+}
+
+const _printReport = (count: number, totalReqTime: number): void => {
+    const res = _calculate(count, totalReqTime);
+    const total = chalk.green('Total requests: ' + res.total);
+    const success = chalk.yellow('Success requests: ' + res.success + '%');
+    const rejected = chalk.red('Rejected requests: ' + res.rejected + '%');
+    const time = Math.round(res.avverageTime * 100) / 100
+    const average = chalk.blue('Average requests time: ' + time + ' ms');
+    const totalTime = chalk.blue('Total request time: ' + totalReqTime + ' ms');
+    const minTime = chalk.green('Min request time: ' + res.minRequestTime + ' ms');
+    const maxTime = chalk.red('Max request time: ' + res.maxRequestTime + ' ms');
+    console.log(total);
+    console.log(success);
+    console.log(rejected);
+    console.log(average);
+    console.log(totalTime);
+    console.log(minTime);
+    console.log(maxTime);
 }
 
 const _testUrl = (url: string): void => {
