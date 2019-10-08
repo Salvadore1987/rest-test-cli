@@ -20,7 +20,7 @@ const init = (args) => {
         const method = args[2].toUpperCase();
         const count = parseInt(args[3]);
         const url = args[4];
-        testUrl(url);
+        _testUrl(url);
         if (method == 'GET')
             doGet(url, count);
         if (method == 'POST')
@@ -33,7 +33,7 @@ const doGet = (url, count) => __awaiter(void 0, void 0, void 0, function* () {
         let result;
         try {
             let begin = Date.now();
-            const res = yield get(url);
+            const res = yield _get(url);
             let end = Date.now();
             result = { error: false, success: true, answerTime: end - begin };
             infoLog(res.data);
@@ -45,15 +45,37 @@ const doGet = (url, count) => __awaiter(void 0, void 0, void 0, function* () {
         results.push(result);
     }
     const end = Date.now();
-    const totalReqTime = Math.round(((end - begin) * 100) / 100);
-    printReport(count, totalReqTime);
+    _printReport(count, _totalReqTime(begin, end));
 });
-const printReport = (count, totalReqTime) => {
-    const res = calculate(count, totalReqTime);
+const doPost = (url, count, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const begin = Date.now();
+    for (let i = 0; i < count; i++) {
+        let result;
+        try {
+            let begin = Date.now();
+            const res = yield _post(url, data);
+            let end = Date.now();
+            result = { error: false, success: true, answerTime: end - begin };
+            infoLog(res.data);
+        }
+        catch (err) {
+            result = { error: true, success: false, answerTime: 0 };
+            errorLog(err.message);
+        }
+        results.push(result);
+    }
+    const end = Date.now();
+    _printReport(count, _totalReqTime(begin, end));
+});
+const _totalReqTime = (begin, end) => {
+    return Math.round(((end - begin) * 100) / 100);
+};
+const _printReport = (count, totalReqTime) => {
+    const res = _calculate(count, totalReqTime);
     const total = chalk.green('Total requests: ' + res.total);
     const success = chalk.yellow('Success requests: ' + res.success + '%');
     const rejected = chalk.red('Rejected requests: ' + res.rejected + '%');
-    const time = Math.round(res.avverageTime * 100) / 100;
+    const time = Math.round(res.averageTime * 100) / 100;
     const average = chalk.blue('Average requests time: ' + time + ' ms');
     const totalTime = chalk.blue('Total request time: ' + totalReqTime + ' ms');
     const minTime = chalk.green('Min request time: ' + res.minRequestTime + ' ms');
@@ -66,68 +88,47 @@ const printReport = (count, totalReqTime) => {
     console.log(minTime);
     console.log(maxTime);
 };
-const doPost = (url, count, data) => __awaiter(void 0, void 0, void 0, function* () {
-    const begin = Date.now();
-    for (let i = 0; i < count; i++) {
-        let result;
-        try {
-            let begin = Date.now();
-            const res = yield post(url, data);
-            let end = Date.now();
-            result = { error: false, success: true, answerTime: end - begin };
-            infoLog(res.data);
-        }
-        catch (err) {
-            result = { error: true, success: false, answerTime: 0 };
-            errorLog(err.message);
-        }
-        results.push(result);
-    }
-    const end = Date.now();
-    const totalReqTime = Math.round(((end - begin) * 100) / 100);
-    printReport(count, totalReqTime);
-});
-const testUrl = (url) => {
+const _testUrl = (url) => {
     if (!url.match(regex))
         throw new Error('Url is not valid');
 };
-const get = (url) => __awaiter(void 0, void 0, void 0, function* () {
+const _get = (url) => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield axios.get(url);
     return res;
 });
-const post = (url, data) => __awaiter(void 0, void 0, void 0, function* () {
+const _post = (url, data) => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield axios.post(url, data);
     return res;
 });
-const calculate = (count, totalReqTime) => {
+const _calculate = (count, totalReqTime) => {
     const report = {
         total: count,
-        rejected: allRejected(count),
-        success: allSuccess(count),
-        avverageTime: average(),
+        rejected: _allRejected(count),
+        success: _allSuccess(count),
+        averageTime: _average(),
         totalRequestTime: totalReqTime,
-        minRequestTime: min(),
-        maxRequestTime: max()
+        minRequestTime: _min(),
+        maxRequestTime: _max()
     };
     return report;
 };
-const min = () => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min);
+const _min = () => {
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min, 0);
     return Math.round((res * 100) / 100);
 };
-const max = () => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((max, p) => p > max ? p : max);
+const _max = () => {
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((max, p) => p > max ? p : max, 0);
     return Math.round((res * 100) / 100);
 };
-const average = () => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((val, idx) => val += idx);
-    return res / results.filter(i => i.success).length;
+const _average = () => {
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((val, idx) => val += idx, 0);
+    return (res != 0) ? res / results.filter(i => i.success).length : 0;
 };
-const allRejected = (count) => {
+const _allRejected = (count) => {
     const res = results.filter(i => i.error == true).map(i => i).length;
     return res * 100 / count;
 };
-const allSuccess = (count) => {
+const _allSuccess = (count) => {
     const res = results.filter(i => i.success == true).map(i => i).length;
     return res * 100 / count;
 };

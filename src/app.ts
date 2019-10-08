@@ -72,7 +72,7 @@ const _printReport = (count: number, totalReqTime: number): void => {
     const total = chalk.green('Total requests: ' + res.total);
     const success = chalk.yellow('Success requests: ' + res.success + '%');
     const rejected = chalk.red('Rejected requests: ' + res.rejected + '%');
-    const time = Math.round(res.avverageTime * 100) / 100
+    const time = Math.round(res.averageTime * 100) / 100
     const average = chalk.blue('Average requests time: ' + time + ' ms');
     const totalTime = chalk.blue('Total request time: ' + totalReqTime + ' ms');
     const minTime = chalk.green('Min request time: ' + res.minRequestTime + ' ms');
@@ -80,8 +80,8 @@ const _printReport = (count: number, totalReqTime: number): void => {
     console.log(total);
     console.log(success);
     console.log(rejected);
-    console.log(average);
     console.log(totalTime);
+    console.log(average);    
     console.log(minTime);
     console.log(maxTime);
 }
@@ -106,7 +106,7 @@ const _calculate = (count: number, totalReqTime: number): IReport => {
         total: count, 
         rejected: _allRejected(count), 
         success: _allSuccess(count), 
-        avverageTime: _average(), 
+        averageTime: _average(), 
         totalRequestTime: totalReqTime,
         minRequestTime: _min(),
         maxRequestTime: _max()
@@ -115,18 +115,18 @@ const _calculate = (count: number, totalReqTime: number): IReport => {
 }
 
 const _min = (): number => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min);
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((min, p) => p < min ? p : min, 0);
     return Math.round((res * 100) / 100);
 }
 
 const _max = (): number => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((max, p) => p > max ? p : max);
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((max, p) => p > max ? p : max, 0);
     return Math.round((res * 100) / 100);
 }
 
 const _average = (): number => {
-    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((val, idx) => val += idx);
-    return res / results.filter(i => i.success).length;
+    const res = results.filter(i => i.success == true).map(i => i.answerTime).reduce((val, idx) => val += idx, 0);
+    return (res != 0) ? res / results.filter(i => i.success).length : 0;
 }
 
 const _allRejected = (count: number): number => {
