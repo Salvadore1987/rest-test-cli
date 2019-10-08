@@ -63,7 +63,7 @@ const doPost = async (url: string, count: number, data?: any): Promise<void> => 
     _printReport(count, _totalReqTime(begin, end));
 }
 
-const _totalReqTime = (begin: number, end: number): number {
+const _totalReqTime = (begin: number, end: number): number => {
     return Math.round(((end - begin) * 100) / 100);
 }
 
